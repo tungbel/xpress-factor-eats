@@ -88,14 +88,14 @@ const ContactSection = () => {
     }
   ];
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       alert('Please fill in all required fields!');
@@ -213,7 +213,7 @@ const ContactSection = () => {
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
-                    rows="6"
+                    rows={6}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-gamboge focus:outline-none transition-colors resize-vertical"
                     placeholder="Tell us how we can help you..."
                     required

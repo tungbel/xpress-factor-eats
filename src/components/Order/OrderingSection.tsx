@@ -4,7 +4,7 @@ import { ShoppingCart, Plus, Minus, MapPin, CreditCard, CheckCircle, Truck } fro
 
 const OrderingSection = () => {
   const [step, setStep] = useState(1);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<Array<{id: number, name: string, price: number, image: string, quantity: number}>>([]);
   const [orderType, setOrderType] = useState('delivery');
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -22,7 +22,7 @@ const OrderingSection = () => {
     { id: 6, name: "BBQ Catfish Platter", price: 4200, image: "🔥" }
   ];
 
-  const addToCart = (item) => {
+  const addToCart = (item: typeof quickMenu[0]) => {
     const existingItem = cart.find(cartItem => cartItem.id === item.id);
     if (existingItem) {
       setCart(cart.map(cartItem => 
@@ -35,14 +35,14 @@ const OrderingSection = () => {
     }
   };
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (id: number, change: number) => {
     setCart(cart.map(item => {
       if (item.id === id) {
         const newQuantity = item.quantity + change;
         return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
       }
       return item;
-    }).filter(Boolean));
+    }).filter(Boolean) as typeof cart);
   };
 
   const getTotalPrice = () => {
@@ -304,7 +304,7 @@ const OrderingSection = () => {
                       value={customerInfo.address}
                       onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
                       className="p-3 border border-gray-300 rounded-lg focus:border-gamboge focus:outline-none md:col-span-2"
-                      rows="3"
+                      rows={3}
                       required
                     />
                   )}
