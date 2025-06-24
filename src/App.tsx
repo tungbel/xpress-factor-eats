@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import PreLaunchPopup from "@/components/PreLaunchPopup";
 import Index from "./pages/Index";
 import Menu from "./pages/Menu";
 import Order from "./pages/Order";
@@ -16,6 +17,10 @@ import Locations from "./pages/Locations";
 import Promos from "./pages/Promos";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import XPressDelivery from "./pages/XPressDelivery";
+import Careers from "./pages/Careers";
+import Franchises from "./pages/Franchises";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +34,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <PreLaunchPopup />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/menu" element={<Menu />} />
@@ -39,6 +45,10 @@ const App = () => (
                 <Route path="/promos" element={<Promos />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/xpress-delivery" element={<XPressDelivery />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/franchises" element={<Franchises />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

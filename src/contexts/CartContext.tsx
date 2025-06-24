@@ -7,6 +7,12 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  customizations?: {
+    sides?: string[];
+    extras?: string[];
+    spiceLevel?: string;
+    specialInstructions?: string;
+  };
 }
 
 interface CartContextType {
@@ -14,6 +20,7 @@ interface CartContextType {
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
+  updateCustomizations: (id: number, customizations: CartItem['customizations']) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
@@ -38,10 +45,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === newItem.id);
+      const existingItem = prevItems.find(item => 
+        item.id === newItem.id && 
+        JSON.stringify(item.customizations) === JSON.stringify(newItem.customizations)
+      );
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === newItem.id
+          item.id === newItem.id && 
+          JSON.stringify(item.customizations) === JSON.stringify(newItem.customizations)
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -67,6 +78,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     );
   };
 
+  const updateCustomizations = (id: number, customizations: CartItem['customizations']) => {
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, customizations } : item
+      )
+    );
+  };
+
   const clearCart = () => {
     setItems([]);
   };
@@ -76,7 +95,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const getTotalPrice = () => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return items.reduce((total, item) => {
+      let itemTotal = item.price * item.quantity;
+      
+      // Add extra costs for customizations
+      if (item.customizations?.sides) {
+        itemTotal += item.customizations.sides.length * 500 * item.quantity; // ₦500 per side
+      }
+      if (item.customizations?.extras) {
+        itemTotal += item.customizations.extras.length * 300 * item.quantity; // ₦300 per extra
+      }
+      
+      return total + itemTotal;
+    }, 0);
   };
 
   const value = {
@@ -84,6 +115,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     addItem,
     removeItem,
     updateQuantity,
+    updateCustomizations,
     clearCart,
     getTotalItems,
     getTotalPrice
