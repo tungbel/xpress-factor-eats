@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChefHat, Star } from 'lucide-react';
+import { ChefHat, Star, Users } from 'lucide-react';
 
 const HeroSection = () => {
   return (

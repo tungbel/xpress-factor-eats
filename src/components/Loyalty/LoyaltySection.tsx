@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Star, Gift, Truck, Users, Award, Crown } from 'lucide-react';
+import { Star, Gift, Truck, Users, Award, Crown, Check } from 'lucide-react';
 
 const LoyaltySection = () => {
   const benefits = [
@@ -152,7 +151,7 @@ const LoyaltySection = () => {
                   <ul className="space-y-2">
                     {tier.perks.map((perk, perkIndex) => (
                       <li key={perkIndex} className="text-sm text-gray-700 flex items-center">
-                        <CheckCircle size={14} className="text-freshness mr-2 flex-shrink-0" />
+                        <Check size={14} className="text-freshness mr-2 flex-shrink-0" />
                         {perk}
                       </li>
                     ))}
