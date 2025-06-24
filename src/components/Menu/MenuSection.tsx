@@ -687,7 +687,10 @@ const MenuSection = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextSibling.style.display = 'flex';
+                      const nextElement = e.currentTarget.nextSibling as HTMLElement;
+                      if (nextElement) {
+                        nextElement.style.display = 'flex';
+                      }
                     }}
                   />
                   <div 
@@ -796,7 +799,10 @@ const MenuSection = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextSibling.style.display = 'flex';
+                    const nextElement = e.currentTarget.nextSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = 'flex';
+                    }
                   }}
                 />
                 <div className="hidden w-full h-full bg-gradient-to-r from-gamboge to-rosso items-center justify-center text-white text-6xl">
