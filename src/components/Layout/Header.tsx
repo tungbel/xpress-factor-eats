@@ -1,20 +1,21 @@
 
 import React, { useState } from 'react';
 import { ChefHat, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: '#home', label: 'Home' },
-    { href: '#menu', label: 'Menu' },
-    { href: '#order', label: 'Order' },
-    { href: '#rewards', label: 'Rewards' },
-    { href: '#catering', label: 'Catering' },
-    { href: '#locations', label: 'Locations' },
-    { href: '#promos', label: 'Promos' },
-    { href: '#about', label: 'About' },
-    { href: '#contact', label: 'Contact' },
+    { href: '/', label: 'Home' },
+    { href: '/menu', label: 'Menu' },
+    { href: '/order', label: 'Order' },
+    { href: '/rewards', label: 'Rewards' },
+    { href: '/catering', label: 'Catering' },
+    { href: '/locations', label: 'Locations' },
+    { href: '/promos', label: 'Promos' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' },
   ];
 
   return (
@@ -22,7 +23,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <img 
               src="http://googleusercontent.com/image_generation_content/1" 
               alt="CatfishXpress Logo" 
@@ -35,18 +36,18 @@ const Header = () => {
             />
             <ChefHat className="h-10 w-10 text-gamboge hidden" />
             <span className="text-xl font-bold text-raisin">CatfishXpress</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex space-x-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                to={link.href}
                 className="text-raisin hover:text-gamboge transition-colors duration-200 font-medium"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -64,14 +65,14 @@ const Header = () => {
           <div className="lg:hidden bg-white border-t border-gray-200">
             <nav className="py-4 space-y-2">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   className="block px-4 py-2 text-raisin hover:text-gamboge hover:bg-gray-50 transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>

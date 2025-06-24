@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { ChefHat, Star, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="home" className="relative min-h-screen flex items-center bg-gradient-to-br from-gamboge via-rosso to-raisin overflow-hidden">
       {/* Background Pattern */}
@@ -58,13 +61,13 @@ const HeroSection = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/menu')}
               className="bg-white text-raisin px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-lg"
             >
               Explore Menu
             </button>
             <button
-              onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/order')}
               className="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-raisin transform hover:scale-105 transition-all duration-300"
             >
               Order Now

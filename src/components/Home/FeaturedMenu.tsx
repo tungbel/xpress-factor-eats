@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Star, ChefHat } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FeaturedMenu = () => {
+  const navigate = useNavigate();
+
   const featuredItems = [
     {
       id: 1,
@@ -110,7 +113,7 @@ const FeaturedMenu = () => {
         {/* View Full Menu CTA */}
         <div className="text-center mt-12">
           <button
-            onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => navigate('/menu')}
             className="bg-gradient-to-r from-gamboge to-rosso text-white px-8 py-4 rounded-full font-bold text-lg hover:from-rosso hover:to-gamboge transform hover:scale-105 transition-all duration-300 shadow-lg"
           >
             View Full Menu
