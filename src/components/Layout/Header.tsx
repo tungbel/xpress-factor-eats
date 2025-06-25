@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChefHat, Menu, X } from 'lucide-react';
+import { ChefHat, Menu, X, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,9 @@ const Header = () => {
     { href: '/catering', label: 'Catering' },
     { href: '/locations', label: 'Locations' },
     { href: '/promos', label: 'Promos' },
+    { href: '/xpress-delivery', label: 'X-Press Delivery' },
+    { href: '/careers', label: 'Careers' },
+    { href: '/franchises', label: 'Franchises' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -49,21 +52,32 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex space-x-8">
+            <nav className="hidden lg:flex space-x-6 xl:space-x-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
-                  className="text-raisin dark:text-white hover:text-gamboge transition-colors duration-200 font-medium"
+                  className="text-raisin dark:text-white hover:text-gamboge transition-colors duration-200 font-medium text-sm xl:text-base"
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
 
-            {/* Right side - Cart and Auth */}
+            {/* Right side - Cart, Admin, and Auth */}
             <div className="flex items-center space-x-4">
               <CartButton />
+              
+              {/* Admin Access - only show if user is admin */}
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className="p-2 text-raisin dark:text-white hover:text-gamboge transition-colors"
+                  title="Admin Dashboard"
+                >
+                  <Shield size={20} />
+                </Link>
+              )}
               
               {user ? (
                 <Button
@@ -114,6 +128,19 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
+                
+                {/* Admin link for mobile */}
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center px-4 py-2 text-raisin dark:text-white hover:text-gamboge hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Shield size={16} className="mr-2" />
+                    Admin Dashboard
+                  </Link>
+                )}
+                
                 <div className="px-4 py-2 space-y-2">
                   {user ? (
                     <Button
