@@ -2,7 +2,6 @@
 import React from 'react';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
-import PreLaunchPopup from '../components/PreLaunchPopup';
 import HeroSection from '../components/Home/HeroSection';
 import FeaturedMenu from '../components/Home/FeaturedMenu';
 import WhyChooseUs from '../components/Home/WhyChooseUs';
@@ -12,7 +11,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <PreLaunchPopup />
       
       {/* Main Content */}
       <main>

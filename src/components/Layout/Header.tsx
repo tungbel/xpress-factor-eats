@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChefHat, Menu, X, Shield, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -38,6 +37,7 @@ const Header = () => {
     { href: '/contact', label: 'Contact' },
     { href: '/careers', label: 'Careers' },
     { href: '/franchises', label: 'Franchises' },
+    { href: '/pre-launch', label: 'Pre-Launch Program' },
   ];
 
   return (

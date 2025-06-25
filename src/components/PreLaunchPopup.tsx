@@ -2,12 +2,21 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, Users } from 'lucide-react';
 
-const PreLaunchPopup = () => {
-  const [isVisible, setIsVisible] = useState(false);
+interface PreLaunchPopupProps {
+  alwaysVisible?: boolean;
+}
+
+const PreLaunchPopup: React.FC<PreLaunchPopupProps> = ({ alwaysVisible = false }) => {
+  const [isVisible, setIsVisible] = useState(alwaysVisible);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
 
   useEffect(() => {
+    if (alwaysVisible) {
+      setIsVisible(true);
+      return;
+    }
+
     // Check if user has already seen the popup
     const hasSeenPopup = localStorage.getItem('catfishxpress-popup-seen');
     if (!hasSeenPopup) {
@@ -17,7 +26,7 @@ const PreLaunchPopup = () => {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [alwaysVisible]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,13 +35,17 @@ const PreLaunchPopup = () => {
       localStorage.setItem('catfishxpress-popup-seen', 'true');
       localStorage.setItem('catfishxpress-waitlist', JSON.stringify({ name, email, date: new Date().toISOString() }));
       alert(`Thanks ${name}! You're now on our exclusive pre-launch waiting list. Get ready for the X-Factor experience!`);
-      setIsVisible(false);
+      if (!alwaysVisible) {
+        setIsVisible(false);
+      }
     }
   };
 
   const handleClose = () => {
-    localStorage.setItem('catfishxpress-popup-seen', 'true');
-    setIsVisible(false);
+    if (!alwaysVisible) {
+      localStorage.setItem('catfishxpress-popup-seen', 'true');
+      setIsVisible(false);
+    }
   };
 
   if (!isVisible) return null;
@@ -40,13 +53,15 @@ const PreLaunchPopup = () => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg max-w-md w-full relative overflow-hidden">
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
-        >
-          <X size={24} />
-        </button>
+        {/* Close button - only show if not always visible */}
+        {!alwaysVisible && (
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
+          >
+            <X size={24} />
+          </button>
+        )}
 
         {/* Header with gradient */}
         <div className="bg-gradient-to-r from-gamboge to-rosso p-6 text-white text-center">
@@ -60,9 +75,9 @@ const PreLaunchPopup = () => {
         {/* Content */}
         <div className="p-6">
           <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold text-raisin mb-2">Pre-Launch Waiting List</h3>
+            <h3 className="text-lg font-semibold text-raisin mb-2">Pre-Launch Program</h3>
             <p className="text-gray-600 text-sm">
-              Get exclusive early access, special discounts, and be the first to know when we launch!
+              Sample our menus, provide feedback, and help us build the perfect QSR experience before our official launch!
             </p>
           </div>
 
@@ -102,13 +117,13 @@ const PreLaunchPopup = () => {
               className="w-full bg-gradient-to-r from-gamboge to-rosso text-white py-3 rounded-md font-semibold hover:from-rosso hover:to-gamboge transition-all duration-300 transform hover:scale-105"
             >
               <Mail className="inline-block mr-2" size={18} />
-              Join Waiting List
+              Join Pre-Launch Program
             </button>
           </form>
 
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-500">
-              🔒 Your information is safe with us. No spam, ever.
+              🔒 Your information is safe with us. Help us build the perfect catfish experience!
             </p>
           </div>
         </div>

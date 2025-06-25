@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import Header from '../components/Layout/Header';
 import Footer from '../components/Layout/Footer';
-import { BarChart3, Users, ShoppingCart, TrendingUp, Calendar, MapPin, Bell, Settings } from 'lucide-react';
+import MenuManagement from '../components/Admin/MenuManagement';
+import { BarChart3, Users, ShoppingCart, TrendingUp, Calendar, MapPin, Bell, Settings, ChefHat } from 'lucide-react';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -43,6 +44,7 @@ const Admin = () => {
           <div className="flex space-x-1 mb-8 bg-muted p-1 rounded-lg">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+              { id: 'menu', label: 'Menu Management', icon: ChefHat },
               { id: 'orders', label: 'Orders', icon: ShoppingCart },
               { id: 'customers', label: 'Customers', icon: Users },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp }
@@ -61,6 +63,9 @@ const Admin = () => {
               </button>
             ))}
           </div>
+
+          {/* Menu Management Tab */}
+          {activeTab === 'menu' && <MenuManagement />}
 
           {/* Dashboard Content */}
           {activeTab === 'dashboard' && (
