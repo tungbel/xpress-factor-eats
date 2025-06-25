@@ -1,8 +1,14 @@
 
 import React, { useState } from 'react';
-import { ChefHat, Menu, X, Shield } from 'lucide-react';
+import { ChefHat, Menu, X, Shield, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginDialog from '@/components/Auth/LoginDialog';
 import SignupDialog from '@/components/Auth/SignupDialog';
@@ -16,7 +22,7 @@ const Header = () => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const { user } = useAuth();
 
-  const navLinks = [
+  const mainNavLinks = [
     { href: '/', label: 'Home' },
     { href: '/menu', label: 'Menu' },
     { href: '/order', label: 'Order' },
@@ -25,10 +31,13 @@ const Header = () => {
     { href: '/locations', label: 'Locations' },
     { href: '/promos', label: 'Promos' },
     { href: '/xpress-delivery', label: 'X-Press Delivery' },
-    { href: '/careers', label: 'Careers' },
-    { href: '/franchises', label: 'Franchises' },
+  ];
+
+  const moreNavLinks = [
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
+    { href: '/careers', label: 'Careers' },
+    { href: '/franchises', label: 'Franchises' },
   ];
 
   return (
@@ -52,8 +61,8 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex space-x-6 xl:space-x-8">
-              {navLinks.map((link) => (
+            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+              {mainNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
@@ -62,6 +71,26 @@ const Header = () => {
                   {link.label}
                 </Link>
               ))}
+              
+              {/* More Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center text-raisin dark:text-white hover:text-gamboge transition-colors duration-200 font-medium text-sm xl:text-base">
+                  More
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  {moreNavLinks.map((link) => (
+                    <DropdownMenuItem key={link.href} asChild>
+                      <Link
+                        to={link.href}
+                        className="text-raisin dark:text-white hover:text-gamboge transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
 
             {/* Right side - Cart, Admin, and Auth */}
@@ -118,7 +147,7 @@ const Header = () => {
           {isMenuOpen && (
             <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
               <nav className="py-4 space-y-2">
-                {navLinks.map((link) => (
+                {mainNavLinks.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
@@ -128,6 +157,21 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
+                
+                {/* More section for mobile */}
+                <div className="px-4 py-2">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">More</div>
+                  {moreNavLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className="block px-2 py-2 text-raisin dark:text-white hover:text-gamboge hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
                 
                 {/* Admin link for mobile */}
                 {user?.role === 'admin' && (
