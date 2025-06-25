@@ -10,39 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  available: boolean;
-}
+import { useMenu, MenuItem } from '@/contexts/MenuContext';
 
 const MenuManagement = () => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      id: '1',
-      name: 'Classic X-Press',
-      description: 'Our signature catfish with special X-Press seasoning',
-      price: 4200,
-      category: 'Main',
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      available: true
-    },
-    {
-      id: '2',
-      name: 'Spicy Deluxe Bowl',
-      description: 'Premium catfish with spicy sauce and sides',
-      price: 3800,
-      category: 'Main',
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      available: true
-    }
-  ]);
-
+  const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu();
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [editForm, setEditForm] = useState<Partial<MenuItem>>({});
@@ -66,16 +37,10 @@ const MenuManagement = () => {
 
   const handleSave = () => {
     if (isAdding) {
-      const newItem: MenuItem = {
-        ...editForm as MenuItem,
-        id: Date.now().toString()
-      };
-      setMenuItems([...menuItems, newItem]);
+      addMenuItem(editForm as Omit<MenuItem, 'id'>);
       setIsAdding(false);
     } else if (isEditing) {
-      setMenuItems(menuItems.map(item => 
-        item.id === isEditing ? { ...item, ...editForm } : item
-      ));
+      updateMenuItem(isEditing, editForm);
       setIsEditing(null);
     }
     setEditForm({});
@@ -89,14 +54,13 @@ const MenuManagement = () => {
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this menu item?')) {
-      setMenuItems(menuItems.filter(item => item.id !== id));
+      deleteMenuItem(id);
     }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you'd upload to a server
       const imageUrl = URL.createObjectURL(file);
       setEditForm({ ...editForm, image: imageUrl });
     }

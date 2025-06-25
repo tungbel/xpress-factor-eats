@@ -1,0 +1,101 @@
+
+import React from 'react';
+import { Star, Plus } from 'lucide-react';
+import { useMenu } from '@/contexts/MenuContext';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
+
+const MenuGrid = () => {
+  const { getMenuItemsByCategory } = useMenu();
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const categories = ['Main', 'Sides', 'Beverages', 'Desserts'];
+
+  const handleAddToCart = (item: any) => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: '🐟',
+      quantity: 1
+    });
+    toast({
+      title: "Added to Cart",
+      description: `${item.name} has been added to your cart.`,
+    });
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-bold text-raisin mb-4">
+          Our <span className="text-gamboge">Menu</span>
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Discover our freshly prepared catfish dishes, made with premium ingredients and our signature X-Factor taste
+        </p>
+      </div>
+
+      {categories.map((category) => {
+        const items = getMenuItemsByCategory(category);
+        if (items.length === 0) return null;
+
+        return (
+          <div key={category} className="mb-16">
+            <h2 className="text-3xl font-bold text-raisin mb-8 text-center">
+              {category}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9';
+                      }}
+                    />
+                    <div className="absolute top-3 right-3 bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
+                      <Star size={14} className="text-yellow-500 fill-current mr-1" />
+                      <span className="text-xs font-semibold text-raisin">4.8</span>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-raisin mb-2">
+                      {item.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      {item.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gamboge">
+                        ₦{item.price.toLocaleString()}
+                      </span>
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className="bg-gamboge text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-rosso transition-colors duration-200 transform hover:scale-105 flex items-center"
+                      >
+                        <Plus size={16} className="mr-1" />
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default MenuGrid;

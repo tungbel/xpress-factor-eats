@@ -2,48 +2,32 @@
 import React from 'react';
 import { Star, ChefHat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useMenu } from '@/contexts/MenuContext';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
 
 const FeaturedMenu = () => {
   const navigate = useNavigate();
+  const { menuItems } = useMenu();
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
-  const featuredItems = [
-    {
-      id: 1,
-      name: "Signature X-Press Catfish Bowl",
-      description: "Our flagship dish featuring perfectly seasoned catfish fillet, served over jasmine rice with fresh vegetables and our secret X-Factor sauce",
-      price: "₦3,500",
-      image: "/api/placeholder/300/200",
-      rating: 4.9,
-      popular: true
-    },
-    {
-      id: 2,
-      name: "Grilled Catfish Supreme",
-      description: "Premium catfish grilled to perfection with aromatic herbs, served with plantain and pepper sauce",
-      price: "₦4,200",
-      image: "/api/placeholder/300/200",
-      rating: 4.8,
-      popular: false
-    },
-    {
-      id: 3,
-      name: "Catfish Pepper Soup Deluxe",
-      description: "Traditional Nigerian pepper soup elevated with our farm-fresh catfish and authentic spice blend",
-      price: "₦2,800",
-      image: "/api/placeholder/300/200",
-      rating: 4.7,
-      popular: true
-    },
-    {
-      id: 4,
-      name: "X-Factor Combo Platter",
-      description: "The best of both worlds - grilled and fried catfish portions with sides and dipping sauces",
-      price: "₦5,500",
-      image: "/api/placeholder/300/200",
-      rating: 4.9,
-      popular: false
-    }
-  ];
+  // Get featured items (first 4 main dishes)
+  const featuredItems = menuItems.filter(item => item.category === 'Main' && item.available).slice(0, 4);
+
+  const handleAddToCart = (item: any) => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: '🐟',
+      quantity: 1
+    });
+    toast({
+      title: "Added to Cart",
+      description: `${item.name} has been added to your cart.`,
+    });
+  };
 
   return (
     <section className="py-20 bg-gray-50">
@@ -68,21 +52,24 @@ const FeaturedMenu = () => {
             >
               {/* Image Container */}
               <div className="relative overflow-hidden h-48">
-                <div className="w-full h-full bg-gradient-to-br from-gamboge to-rosso flex items-center justify-center">
-                  <ChefHat size={60} className="text-white opacity-50" />
-                </div>
+                <img 
+                  src={item.image} 
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9';
+                  }}
+                />
                 
                 {/* Popular Badge */}
-                {item.popular && (
-                  <div className="absolute top-3 left-3 bg-rosso text-white px-2 py-1 rounded-full text-xs font-semibold">
-                    🔥 Popular
-                  </div>
-                )}
+                <div className="absolute top-3 left-3 bg-rosso text-white px-2 py-1 rounded-full text-xs font-semibold">
+                  🔥 Popular
+                </div>
                 
                 {/* Rating */}
                 <div className="absolute top-3 right-3 bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
                   <Star size={14} className="text-yellow-500 fill-current mr-1" />
-                  <span className="text-xs font-semibold text-raisin">{item.rating}</span>
+                  <span className="text-xs font-semibold text-raisin">4.8</span>
                 </div>
               </div>
 
@@ -97,10 +84,10 @@ const FeaturedMenu = () => {
                 
                 {/* Price and Action */}
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-gamboge">{item.price}</span>
+                  <span className="text-2xl font-bold text-gamboge">₦{item.price.toLocaleString()}</span>
                   <button
                     className="bg-gamboge text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-rosso transition-colors duration-200 transform hover:scale-105"
-                    onClick={() => alert(`Added ${item.name} to cart! (Simulation)`)}
+                    onClick={() => handleAddToCart(item)}
                   >
                     Add to Cart
                   </button>

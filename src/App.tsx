@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { MenuProvider } from "@/contexts/MenuContext";
 import Index from "./pages/Index";
 import Menu from "./pages/Menu";
 import Order from "./pages/Order";
@@ -21,6 +22,8 @@ import Careers from "./pages/Careers";
 import Franchises from "./pages/Franchises";
 import Admin from "./pages/Admin";
 import PreLaunch from "./pages/PreLaunch";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import DeliveryTracking from "./pages/DeliveryTracking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,31 +32,35 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/order" element={<Order />} />
-                <Route path="/rewards" element={<Rewards />} />
-                <Route path="/catering" element={<Catering />} />
-                <Route path="/locations" element={<Locations />} />
-                <Route path="/promos" element={<Promos />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/xpress-delivery" element={<XPressDelivery />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/franchises" element={<Franchises />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/pre-launch" element={<PreLaunch />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </CartProvider>
+        <MenuProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/order" element={<Order />} />
+                  <Route path="/rewards" element={<Rewards />} />
+                  <Route path="/catering" element={<Catering />} />
+                  <Route path="/locations" element={<Locations />} />
+                  <Route path="/promos" element={<Promos />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/xpress-delivery" element={<XPressDelivery />} />
+                  <Route path="/careers" element={<Careers />} />
+                  <Route path="/franchises" element={<Franchises />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/pre-launch" element={<PreLaunch />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/delivery-tracking" element={<DeliveryTracking />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </CartProvider>
+        </MenuProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
