@@ -1,10 +1,10 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
   id: string;
   name: string;
   email: string;
+  role?: 'admin' | 'user';
 }
 
 interface AuthContextType {
@@ -42,7 +42,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const mockUser = {
         id: '1',
         name: email.split('@')[0],
-        email: email
+        email: email,
+        role: email === 'admin@catfishxpress.com' ? 'admin' as const : 'user' as const
       };
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
@@ -62,7 +63,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const mockUser = {
         id: '1',
         name: name,
-        email: email
+        email: email,
+        role: email === 'admin@catfishxpress.com' ? 'admin' as const : 'user' as const
       };
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
