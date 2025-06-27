@@ -21,6 +21,7 @@ import XPressDelivery from "./pages/XPressDelivery";
 import Careers from "./pages/Careers";
 import Franchises from "./pages/Franchises";
 import Admin from "./pages/Admin";
+import Auth from "./pages/Auth";
 import PreLaunch from "./pages/PreLaunch";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import DeliveryTracking from "./pages/DeliveryTracking";
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/franchises" element={<Franchises />} />
                   <Route path="/admin" element={<Admin />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/pre-launch" element={<PreLaunch />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                   <Route path="/delivery-tracking" element={<DeliveryTracking />} />

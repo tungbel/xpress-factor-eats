@@ -13,7 +13,7 @@ import {
 import { useMenu, MenuItem } from '@/contexts/MenuContext';
 
 const MenuManagement = () => {
-  const { menuItems, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu();
+  const { menuItems, loading, addMenuItem, updateMenuItem, deleteMenuItem } = useMenu();
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [editForm, setEditForm] = useState<Partial<MenuItem>>({});
@@ -30,20 +30,24 @@ const MenuManagement = () => {
       description: '',
       price: 0,
       category: 'Main',
-      image: '',
+      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
       available: true
     });
   };
 
-  const handleSave = () => {
-    if (isAdding) {
-      addMenuItem(editForm as Omit<MenuItem, 'id'>);
-      setIsAdding(false);
-    } else if (isEditing) {
-      updateMenuItem(isEditing, editForm);
-      setIsEditing(null);
+  const handleSave = async () => {
+    try {
+      if (isAdding) {
+        await addMenuItem(editForm as Omit<MenuItem, 'id'>);
+        setIsAdding(false);
+      } else if (isEditing) {
+        await updateMenuItem(isEditing, editForm);
+        setIsEditing(null);
+      }
+      setEditForm({});
+    } catch (error) {
+      console.error('Error saving menu item:', error);
     }
-    setEditForm({});
   };
 
   const handleCancel = () => {
@@ -52,9 +56,13 @@ const MenuManagement = () => {
     setEditForm({});
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this menu item?')) {
-      deleteMenuItem(id);
+      try {
+        await deleteMenuItem(id);
+      } catch (error) {
+        console.error('Error deleting menu item:', error);
+      }
     }
   };
 
@@ -65,6 +73,14 @@ const MenuManagement = () => {
       setEditForm({ ...editForm, image: imageUrl });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-lg">Loading menu items...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -99,10 +115,11 @@ const MenuManagement = () => {
               <label className="block text-sm font-medium mb-1">Price (₦)</label>
               <input
                 type="number"
+                step="0.01"
                 value={editForm.price || ''}
                 onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
                 className="w-full px-3 py-2 border rounded-md"
-                placeholder="0"
+                placeholder="0.00"
               />
             </div>
             
@@ -114,33 +131,24 @@ const MenuManagement = () => {
                 className="w-full px-3 py-2 border rounded-md"
               >
                 <option value="Main">Main</option>
+                <option value="Bowls">Bowls</option>
+                <option value="Grilled">Grilled</option>
+                <option value="Snacks">Snacks</option>
+                <option value="Combos">Combos</option>
                 <option value="Sides">Sides</option>
                 <option value="Beverages">Beverages</option>
-                <option value="Desserts">Desserts</option>
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Image</label>
-              <div className="flex space-x-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label
-                  htmlFor="image-upload"
-                  className="flex items-center px-3 py-2 border rounded-md cursor-pointer hover:bg-gray-50"
-                >
-                  <Upload size={16} className="mr-2" />
-                  Upload Image
-                </label>
-                {editForm.image && (
-                  <img src={editForm.image} alt="Preview" className="h-10 w-10 object-cover rounded" />
-                )}
-              </div>
+              <label className="block text-sm font-medium mb-1">Image URL</label>
+              <input
+                type="url"
+                value={editForm.image || ''}
+                onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="https://example.com/image.jpg"
+              />
             </div>
           </div>
           
@@ -201,6 +209,9 @@ const MenuManagement = () => {
                     src={item.image} 
                     alt={item.name}
                     className="h-12 w-12 object-cover rounded"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9';
+                    }}
                   />
                 </TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>

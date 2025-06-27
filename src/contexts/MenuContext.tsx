@@ -1,5 +1,7 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export interface MenuItem {
   id: string;
@@ -13,10 +15,12 @@ export interface MenuItem {
 
 interface MenuContextType {
   menuItems: MenuItem[];
-  addMenuItem: (item: Omit<MenuItem, 'id'>) => void;
-  updateMenuItem: (id: string, item: Partial<MenuItem>) => void;
-  deleteMenuItem: (id: string) => void;
+  loading: boolean;
+  addMenuItem: (item: Omit<MenuItem, 'id'>) => Promise<void>;
+  updateMenuItem: (id: string, item: Partial<MenuItem>) => Promise<void>;
+  deleteMenuItem: (id: string) => Promise<void>;
   getMenuItemsByCategory: (category: string) => MenuItem[];
+  refreshMenu: () => Promise<void>;
 }
 
 const MenuContext = createContext<MenuContextType | undefined>(undefined);
@@ -30,83 +34,165 @@ export const useMenu = () => {
 };
 
 export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      id: '1',
-      name: 'Classic X-Press',
-      description: 'Our signature catfish with special X-Press seasoning',
-      price: 4200,
-      category: 'Main',
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      available: true
-    },
-    {
-      id: '2',
-      name: 'Spicy Deluxe Bowl',
-      description: 'Premium catfish with spicy sauce and sides',
-      price: 3800,
-      category: 'Main',
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      available: true
-    },
-    {
-      id: '3',
-      name: 'Grilled Supreme',
-      description: 'Perfectly grilled catfish with herbs',
-      price: 4800,
-      category: 'Main',
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      available: true
-    },
-    {
-      id: '4',
-      name: 'Catfish Fries',
-      description: 'Crispy seasoned fries',
-      price: 1500,
-      category: 'Sides',
-      image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877',
-      available: true
-    },
-    {
-      id: '5',
-      name: 'Fresh Juice',
-      description: 'Freshly squeezed orange juice',
-      price: 800,
-      category: 'Beverages',
-      image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423',
-      available: true
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchMenuItems = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select('*')
+        .order('category', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching menu items:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load menu items",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const formattedItems = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        price: item.price,
+        category: item.category,
+        image: item.image_url || 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
+        available: item.available
+      }));
+
+      setMenuItems(formattedItems);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const addMenuItem = (item: Omit<MenuItem, 'id'>) => {
-    const newItem: MenuItem = {
-      ...item,
-      id: Date.now().toString()
-    };
-    setMenuItems(prev => [...prev, newItem]);
   };
 
-  const updateMenuItem = (id: string, updatedItem: Partial<MenuItem>) => {
-    setMenuItems(prev => prev.map(item => 
-      item.id === id ? { ...item, ...updatedItem } : item
-    ));
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
+
+  const addMenuItem = async (item: Omit<MenuItem, 'id'>) => {
+    try {
+      const { error } = await supabase
+        .from('menu_items')
+        .insert({
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          category: item.category,
+          image_url: item.image,
+          available: item.available
+        });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to add menu item",
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Menu item added successfully"
+      });
+
+      await fetchMenuItems();
+    } catch (error) {
+      console.error('Error adding menu item:', error);
+      throw error;
+    }
   };
 
-  const deleteMenuItem = (id: string) => {
-    setMenuItems(prev => prev.filter(item => item.id !== id));
+  const updateMenuItem = async (id: string, item: Partial<MenuItem>) => {
+    try {
+      const updateData: any = {};
+      if (item.name !== undefined) updateData.name = item.name;
+      if (item.description !== undefined) updateData.description = item.description;
+      if (item.price !== undefined) updateData.price = item.price;
+      if (item.category !== undefined) updateData.category = item.category;
+      if (item.image !== undefined) updateData.image_url = item.image;
+      if (item.available !== undefined) updateData.available = item.available;
+
+      const { error } = await supabase
+        .from('menu_items')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update menu item",
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Menu item updated successfully"
+      });
+
+      await fetchMenuItems();
+    } catch (error) {
+      console.error('Error updating menu item:', error);
+      throw error;
+    }
+  };
+
+  const deleteMenuItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('menu_items')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete menu item",
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Menu item deleted successfully"
+      });
+
+      await fetchMenuItems();
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+      throw error;
+    }
   };
 
   const getMenuItemsByCategory = (category: string) => {
     return menuItems.filter(item => item.category === category && item.available);
   };
 
+  const refreshMenu = async () => {
+    await fetchMenuItems();
+  };
+
   return (
     <MenuContext.Provider value={{
       menuItems,
+      loading,
       addMenuItem,
       updateMenuItem,
       deleteMenuItem,
-      getMenuItemsByCategory
+      getMenuItemsByCategory,
+      refreshMenu
     }}>
       {children}
     </MenuContext.Provider>

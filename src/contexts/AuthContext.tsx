@@ -1,18 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role?: 'admin' | 'user';
-}
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  isLoading: boolean;
+  session: Session | null;
+  loading: boolean;
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,75 +24,120 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { toast } = useToast();
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    // Mock login - replace with actual authentication
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email && password) {
-      const mockUser = {
-        id: '1',
-        name: email.split('@')[0],
-        email: email,
-        role: email === 'admin@catfishxpress.com' ? 'admin' as const : 'user' as const
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      setIsLoading(false);
-      return true;
-    }
-    setIsLoading(false);
-    return false;
-  };
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Check if user is admin
+          setTimeout(async () => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            
+            setIsAdmin(profile?.role === 'admin');
+          }, 0);
+        } else {
+          setIsAdmin(false);
+        }
+        
+        setLoading(false);
+      }
+    );
 
-  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    // Mock signup - replace with actual authentication
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (name && email && password) {
-      const mockUser = {
-        id: '1',
-        name: name,
-        email: email,
-        role: email === 'admin@catfishxpress.com' ? 'admin' as const : 'user' as const
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      setIsLoading(false);
-      return true;
-    }
-    setIsLoading(false);
-    return false;
-  };
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-  };
-
-  React.useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    return () => subscription.unsubscribe();
   }, []);
 
-  const value = {
-    user,
-    login,
-    signup,
-    logout,
-    isLoading
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName
+        }
+      }
+    });
+    
+    if (error) {
+      toast({
+        title: "Signup Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Success!",
+        description: "Please check your email to confirm your account."
+      });
+    }
+    
+    return { error };
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) {
+      toast({
+        title: "Login Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "You've been successfully logged in."
+      });
+    }
+    
+    return { error };
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Signed out",
+      description: "You've been successfully signed out."
+    });
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      session,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      isAdmin
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
