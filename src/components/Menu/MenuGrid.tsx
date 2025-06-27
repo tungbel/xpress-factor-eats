@@ -1,16 +1,34 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, Plus } from 'lucide-react';
 import { useMenu } from '@/contexts/MenuContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const MenuGrid = () => {
-  const { getMenuItemsByCategory } = useMenu();
+  const { getMenuItemsByCategory, menuItems } = useMenu();
   const { addItem } = useCart();
   const { toast } = useToast();
 
-  const categories = ['Main', 'Sides', 'Beverages', 'Desserts'];
+  const categories = [
+    { id: 'all', name: 'All', dbCategory: '' },
+    { id: 'main', name: 'X-Press Mains', dbCategory: 'Main' },
+    { id: 'bowls', name: 'Signature Bowls', dbCategory: 'Bowls' },
+    { id: 'grilled', name: 'Grilled Plates', dbCategory: 'Grilled' },
+    { id: 'snacks', name: 'Snacks', dbCategory: 'Snacks' },
+    { id: 'combos', name: 'Combos', dbCategory: 'Combos' },
+    { id: 'sides', name: 'Sides', dbCategory: 'Sides' },
+    { id: 'drinks', name: 'Drinks', dbCategory: 'Beverages' }
+  ];
+
+  const getItemsForCategory = (categoryId: string) => {
+    if (categoryId === 'all') {
+      return menuItems.filter(item => item.available);
+    }
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? getMenuItemsByCategory(category.dbCategory) : [];
+  };
 
   const handleAddToCart = (item: any) => {
     addItem({
@@ -37,17 +55,23 @@ const MenuGrid = () => {
         </p>
       </div>
 
-      {categories.map((category) => {
-        const items = getMenuItemsByCategory(category);
-        if (items.length === 0) return null;
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
+          {categories.map((category) => (
+            <TabsTrigger 
+              key={category.id} 
+              value={category.id}
+              className="text-sm font-medium"
+            >
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-        return (
-          <div key={category} className="mb-16">
-            <h2 className="text-3xl font-bold text-raisin mb-8 text-center">
-              {category}
-            </h2>
+        {categories.map((category) => (
+          <TabsContent key={category.id} value={category.id}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {items.map((item) => (
+              {getItemsForCategory(category.id).map((item) => (
                 <div
                   key={item.id}
                   className="bg-white rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 overflow-hidden"
@@ -91,9 +115,17 @@ const MenuGrid = () => {
                 </div>
               ))}
             </div>
-          </div>
-        );
-      })}
+
+            {getItemsForCategory(category.id).length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🍽️</div>
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+                <p className="text-gray-500">Items will appear here when added from the admin panel</p>
+              </div>
+            )}
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 };
