@@ -11,7 +11,11 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   isAdmin: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,6 +131,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
+  // Legacy methods for compatibility
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const { error } = await signIn(email, password);
+    return !error;
+  };
+
+  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
+    const { error } = await signUp(email, password, name);
+    return !error;
+  };
+
+  const logout = async () => {
+    await signOut();
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -135,7 +154,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       signUp,
       signIn,
       signOut,
-      isAdmin
+      login,
+      signup,
+      logout,
+      isAdmin,
+      isLoading: loading
     }}>
       {children}
     </AuthContext.Provider>

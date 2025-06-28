@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ interface AccountDialogProps {
 }
 
 const AccountDialog: React.FC<AccountDialogProps> = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
 
   // Mock user data - in real app this would come from backend
@@ -36,8 +35,16 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ isOpen, onClose }) => {
   });
 
   const handleLogout = () => {
-    logout();
+    signOut();
     onClose();
+  };
+
+  // Get user display name from metadata or email
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name;
+    }
+    return user?.email || 'User';
   };
 
   return (
@@ -66,7 +73,7 @@ const AccountDialog: React.FC<AccountDialogProps> = ({ isOpen, onClose }) => {
                   <User size={32} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">{user?.name}</h3>
+                  <h3 className="text-xl font-bold">{getUserDisplayName()}</h3>
                   <p className="opacity-90">{user?.email}</p>
                   <div className="flex items-center mt-2">
                     <Star className="text-yellow-300 mr-1" size={16} />
