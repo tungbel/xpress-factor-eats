@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               .eq('id', session.user.id)
               .single();
             
-            setIsAdmin(profile?.role === 'admin');
+            setIsAdmin(profile?.role === 'admin' || false);
           }, 0);
         } else {
           setIsAdmin(false);

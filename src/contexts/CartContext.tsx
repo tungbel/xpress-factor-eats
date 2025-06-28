@@ -125,8 +125,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .select()
         .single();
 
-      if (orderError) {
-        throw orderError;
+      if (orderError || !order) {
+        throw orderError || new Error('Failed to create order');
       }
 
       // Create order items
