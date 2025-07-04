@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Star, Gift, Truck, Users, Award, Crown, Check } from 'lucide-react';
 
 const LoyaltySection = () => {
@@ -223,18 +225,18 @@ const LoyaltySection = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => alert('Sign up simulation - Welcome to X-Press Rewards! 🎉')}
+              <Link
+                to="/signup"
                 className="bg-white text-raisin px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors transform hover:scale-105"
               >
                 Join Free Today
-              </button>
-              <button
-                onClick={() => alert('Member login simulation')}
+              </Link>
+              <Link
+                to="/auth"
                 className="border-2 border-white text-white hover:bg-white hover:text-raisin px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105"
               >
                 Member Login
-              </button>
+              </Link>
             </div>
           </div>
         </div>

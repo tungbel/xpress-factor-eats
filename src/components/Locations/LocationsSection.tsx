@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, Clock, Phone, Calendar } from 'lucide-react';
 
 const LocationsSection = () => {
@@ -169,14 +170,14 @@ const LocationsSection = () => {
                 </div>
 
                 <div className="flex space-x-3">
-                  <button
-                    onClick={() => alert(`Directions to ${outlet.name} simulation - This would open maps with directions!`)}
-                    className="flex-1 bg-gamboge text-white py-2 px-4 rounded-full font-semibold hover:bg-rosso transition-colors"
+                  <Link
+                    to={`/directions?outlet=${encodeURIComponent(outlet.name)}&address=${encodeURIComponent(outlet.address)}&phone=${encodeURIComponent(outlet.phone)}`}
+                    className="flex-1 bg-gamboge text-white py-2 px-4 rounded-full font-semibold hover:bg-rosso transition-colors text-center"
                   >
                     Get Directions
-                  </button>
+                  </Link>
                   <button
-                    onClick={() => alert(`Calling ${outlet.name} at ${outlet.phone}`)}
+                    onClick={() => window.open(`tel:${outlet.phone}`, '_self')}
                     className="px-4 py-2 border border-gamboge text-gamboge rounded-full font-semibold hover:bg-gamboge hover:text-white transition-all"
                   >
                     Call
@@ -232,12 +233,12 @@ const LocationsSection = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => alert(`RSVP for ${event.location} pop-up on ${event.date}!\n\nSpecial Offer: ${event.specialOffer}\n\nThank you for your interest! We'll send you a reminder closer to the event date. 🎉`)}
+                      <Link
+                        to={`/event-rsvp?date=${encodeURIComponent(event.date)}&time=${encodeURIComponent(event.time)}&location=${encodeURIComponent(event.location)}&address=${encodeURIComponent(event.address)}&offer=${encodeURIComponent(event.specialOffer)}`}
                         className="bg-gamboge text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-rosso transition-colors"
                       >
                         RSVP
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))}

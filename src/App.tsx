@@ -22,6 +22,9 @@ import Careers from "./pages/Careers";
 import Franchises from "./pages/Franchises";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
+import SignUp from "./pages/SignUp";
+import Directions from "./pages/Directions";
+import EventRsvp from "./pages/EventRsvp";
 import PreLaunch from "./pages/PreLaunch";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import DeliveryTracking from "./pages/DeliveryTracking";
@@ -54,6 +57,9 @@ const App = () => (
                   <Route path="/franchises" element={<Franchises />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/directions" element={<Directions />} />
+                  <Route path="/event-rsvp" element={<EventRsvp />} />
                   <Route path="/pre-launch" element={<PreLaunch />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                   <Route path="/delivery-tracking" element={<DeliveryTracking />} />
